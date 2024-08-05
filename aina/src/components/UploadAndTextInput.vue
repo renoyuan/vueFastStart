@@ -1,19 +1,18 @@
-<script setup lang="ts">
+<script setup >
 import {defineComponent, ref} from 'vue';
 import axios from 'axios';
-import type {UploadFile} from 'element-plus';
+// import  {UploadFile} from 'element-plus';
 
 defineComponent({
 
   text: ref(''),
-  fileList: ref<UploadFile[]>([]),
+  fileList: ref([]),
   resultVisible: ref(false),
   resultStatus: ref(''),
   resultTitle: ref(''),
   resultSubtitle: ref(''),
   submitText()  {
     if (this.text.value.trim()) {
-
       axios.post('/api/text', { text: text.value })
           .then(response => {
             showResult('success', '成功', '文本已提交')
