@@ -3,37 +3,43 @@
     <el-scrollbar wrap-class="scrollbar-wrapper">
       <div class="chat-content">
         <div v-for="message in this.messages" :key="message.id" class="message">
-          <ChatSquare/>
-          <el-icon :size="20">
-            <ChatSquare/>
-          </el-icon>
-          <span :class="{ 'me':  message.from === 'me','other':  message.from === 'other' }">{{ message.from }}：</span>
-          <span :class="{ 'me':  message.from === 'me','other':  message.from === 'other' }">{{ message.text }}</span>
+
+          <span>
+            <el-text size="small"
+                     :class="{ 'mx-1':true, 'user':true, 'me':  message.from === 'me','robot':  message.from === 'robot' }"
+                     type="primary">{{ message.from }}</el-text>
+            <el-text
+                :class="{ 'mx-1':true,'user':true,'me':  message.from === 'me','robot':  message.from === 'robot' }">{{
+                message.text
+              }}</el-text></span>
         </div>
       </div>
 
     </el-scrollbar>
+    <el-icon :size="size" :color="color">
+      <Document/>
+    </el-icon>
     <el-input v-model="this.newMessage" placeholder="Type your message" @keyup.enter="this.sendMessage"></el-input>
   </div>
 </template>
 
 <script>
-import {defineComponent, ref, onMounted} from 'vue'
 import {BACKEND, CALL_LLM_URL} from '../config'
 
 import {ElMessage} from 'element-plus'
 
 export default {
-  name: 'Chat',
   data() {
 
     return {
       messages: [
         // 初始化一些消息
-        {id: 1, text: 'Hello there!', from: 'other'},
+        {id: 1, text: 'Hello there!', from: 'robot'},
         {id: 2, text: 'Hi, how are you?', from: 'me'}
       ],
-      newMessage: ""
+      newMessage: "",
+      session_id:"",
+      model_key:""
     };
 
   },
@@ -48,7 +54,8 @@ export default {
 
       const data = {
         query: newMessage_value,
-        session_id: 'john.doe@example.com',
+        session_id: this.session_id, // 动态生成
+        model_key: "qwen", // api 获取
       };
 
       if (newMessage_value) {
@@ -71,13 +78,17 @@ export default {
           const res_data_ = res_data.data
           console.log(res_data.data)
           let res_message = res_data_.answer
-
+          this.session_id= res_data.session_id
           console.log(res_message, res_data_.session_id)
-          this.messages.push({id: this.messages.length + 1, text: res_message, from: 'other'});
+          this.messages.push({id: this.messages.length + 1, text: res_message, from: 'robot'});
         } catch (error) {
           ElMessage.error('Failed to fetch messages');
         }
       }
+    },
+
+    generateUUIDv4(){
+      return crypto.randomUUID();
     },
 
     sendMessage() {
@@ -110,7 +121,14 @@ export default {
   flex-direction: column;
 }
 
+.user {
+  height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
 .chat-content {
+  width: 100%;
   flex: 1;
   overflow-y: auto;
 }

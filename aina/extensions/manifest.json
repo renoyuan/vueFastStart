@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "My Vue Extension",
+  "version": "1.0",
+  "description": "A description of your extension.",
+  "options_page": "dist/index.html",
+  "homepage_url": "http://blog.yuanhaiying.cn/",
+  "action": {
+    "default_popup": "dist/index.html",
+    "options_page": "dist/index.html",
+    "default_icon": {
+      "16": "dist/favicon.ico"
+    }
+  },
+  "permissions": ["activeTab", "storage"]
+
+}
