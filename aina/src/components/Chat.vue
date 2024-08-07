@@ -24,9 +24,9 @@
 </template>
 
 <script>
-import {BACKEND, CALL_LLM_URL} from '../config'
-
-import {ElMessage} from 'element-plus'
+import {BACKEND, CALL_LLM_URL} from '../config';
+import {postBackendData} from './CallBackend.js';
+import {ElMessage} from 'element-plus';
 
 export default {
   data() {
@@ -38,8 +38,8 @@ export default {
         {id: 2, text: 'Hi, how are you?', from: 'me'}
       ],
       newMessage: "",
-      session_id:"",
-      model_key:""
+      session_id: "",
+      model_key: ""
     };
 
   },
@@ -60,34 +60,20 @@ export default {
 
       if (newMessage_value) {
         try {
-          const response = await fetch(CALL_LLM_URL,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'no-cors': true,
-                  'Access-Control-Allow-Origin': '*',
-                  'Access-Control-Allow-Headers': 'Content-Type, Content-Length, Authorization, Accept, X-Requested-With , yourHeaderFeild',
-                  'Access-Control-Allow-Methods': 'PUT, POST, GET, DELETE, OPTIONS'
-
-                },
-                body: JSON.stringify(data),
-              }
-          )
-          const res_data = await response.json()
-          const res_data_ = res_data.data
-          console.log(res_data.data)
-          let res_message = res_data_.answer
-          this.session_id= res_data.session_id
-          console.log(res_message, res_data_.session_id)
-          this.messages.push({id: this.messages.length + 1, text: res_message, from: 'robot'});
+          const res = await postBackendData(data, "POST", CALL_LLM_URL)
+          const res_data = res.data
+          this.session_id = res_data.session_id
+          this.messages.push({id: this.messages.length + 1, text: res_data.answer, from: 'robot'});
         } catch (error) {
+          console.error("error", error)
           ElMessage.error('Failed to fetch messages');
         }
+
+
       }
     },
 
-    generateUUIDv4(){
+    generateUUIDv4() {
       return crypto.randomUUID();
     },
 
